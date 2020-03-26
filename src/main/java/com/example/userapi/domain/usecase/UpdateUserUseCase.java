@@ -7,6 +7,7 @@ import com.example.userapi.base.RequestHandler;
 import com.example.userapi.domain.dto.UserDto;
 import com.example.userapi.domain.repository.UserRepository;
 import com.example.userapi.exception.InvalidFieldInputException;
+import com.example.userapi.exception.UnexpectedException;
 import com.example.userapi.helper.UserValidation;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,20 +22,23 @@ public class UpdateUserUseCase implements RequestHandler<Composite<UserDto, Stri
     public Object handle(Composite<UserDto, String> userData) {
         try {
             UserDto newUserData = userData.getOne();
+            String oldUsername = userData.getTwo();
             if (UserValidation.validateUserInput(newUserData)) {
-                String oldUsername = userData.getTwo();
-                String salt = userRepository.findByUsername(oldUsername).get(0).getGeneratedSalt();
-                String newPassword = UserValidation.encodePassword(newUserData.getPassword(), salt);
-                userRepository.updateUser(newUserData.getUsername(), newPassword, newUserData.getDisplayName(),
-                        newUserData.getEmail(), oldUsername);
+                updateUser(newUserData, oldUsername);
                 return new Boolean(true);
             } else {
                 List<String> invalidFields = UserValidation.getInvalidFields(newUserData);
                 return new InvalidFieldInputException(invalidFields);
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return false;
+            return new UnexpectedException();
         }
+    }
+
+    private void updateUser(UserDto newUserData, String oldUsername) {
+        String salt = userRepository.findByUsername(oldUsername).get(0).getGeneratedSalt();
+        String newPassword = UserValidation.encodePassword(newUserData.getPassword(), salt);
+        userRepository.updateUser(newUserData.getUsername(), newPassword, newUserData.getDisplayName(),
+                newUserData.getEmail(), oldUsername);
     }
 }
