@@ -22,16 +22,16 @@ public class UserValidation {
     public static List<String> getInvalidFields(UserDto input) {
         List<String> invalidFields = new ArrayList<>();
         if (!validateUsername(input.getUsername())) {
-            invalidFields.add("username");
+            invalidFields.add("Username");
         }
         if (!validateEnteredPassword(input.getPassword())) {
-            invalidFields.add("password");
+            invalidFields.add("Password");
         }
         if (!validateDisplayName(input.getDisplayName())) {
-            invalidFields.add("displayName");
+            invalidFields.add("Display name");
         }
         if (!validateEmail(input.getEmail())) {
-            invalidFields.add("email");
+            invalidFields.add("Email");
         }
         return invalidFields;
     }
@@ -44,18 +44,22 @@ public class UserValidation {
     }
 
     private static boolean validateUsername(String username) {
+        if (username == null) return false;
         return USERNAME_PATTERN.matcher(username).matches();
     }
 
     private static boolean validateEnteredPassword(String password) {
+        if (password == null) return false;
         return RAW_PASSWORD_PATTERN.matcher(password).matches();
     }
     
     private static boolean validateDisplayName(String displayName) {
+        if (displayName == null) return false;
         return DISPLAY_NAME_PATTERN.matcher(displayName).matches();
     }
 
     private static boolean validateEmail(String email) {
+        if (email == null) return false;
         return email.length() > 0 && email.length() < 1023 && EMAIL_PATTERN.matcher(email).matches();
     }
 
@@ -64,6 +68,7 @@ public class UserValidation {
     }
 
     public static boolean validatePassword(String entered, String expectedEncoded, String generatedSalt) {
+        if (entered == null) return false;
         String encodedEntered = encodePassword(entered, generatedSalt);
         return encodedEntered.equals(expectedEncoded);
     }

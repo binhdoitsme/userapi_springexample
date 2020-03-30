@@ -1,7 +1,5 @@
 package com.example.userapi.domain.repository;
 
-import java.util.List;
-
 import javax.transaction.Transactional;
 
 import com.example.userapi.domain.model.User;
@@ -22,5 +20,6 @@ public interface UserRepository extends JpaRepository<User, Integer> {
                         @Param("_display_name") String newDisplayName, @Param("_email")String newEmail, 
                         @Param("_old_username") String oldUsername);
 
-    List<User> findByUsername(String username);
+    @Query(value="SELECT * FROM User u WHERE u.username = :_username LIMIT 1", nativeQuery=true)
+    User findByUsername(@Param("_username") String username);
 }

@@ -1,7 +1,5 @@
 package com.example.userapi.domain.usecase;
 
-import java.util.List;
-
 import com.example.userapi.base.RequestHandler;
 import com.example.userapi.domain.dto.UserDto;
 import com.example.userapi.domain.dto.UserToken;
@@ -19,16 +17,16 @@ public class LoginUseCase implements RequestHandler<UserDto, UserToken> {
 
     @Override
     public UserToken handle(UserDto userDto) {
-        List<User> retrievedUser = userRepository.findByUsername(userDto.getUsername());
-        if (retrievedUser.size() == 0) {
+        User retrievedUser = userRepository.findByUsername(userDto.getUsername());
+        if (retrievedUser == null) {
             System.out.println(UserMapper.unauthorizedUser());
             return UserMapper.unauthorizedUser();
         }
-        User u = retrievedUser.get(0);
+        
         boolean validated = UserValidation.validatePassword(userDto.getPassword(),
-                                            u.getPassword(), u.getGeneratedSalt());
+                                retrievedUser.getPassword(), retrievedUser.getGeneratedSalt());
         if (validated) {
-            return UserMapper.toUserToken(u);
+            return UserMapper.toUserToken(retrievedUser);
         } else {
             return UserMapper.unauthorizedUser();
         }

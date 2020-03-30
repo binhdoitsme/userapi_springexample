@@ -6,6 +6,7 @@ import com.example.userapi.domain.dto.UserToken;
 import com.example.userapi.domain.usecase.LoginUseCase;
 import com.example.userapi.domain.usecase.RegisterUserUseCase;
 import com.example.userapi.domain.usecase.UpdateUserUseCase;
+import com.example.userapi.exception.UserFriendlyExceptionMessage;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -29,7 +30,7 @@ public class UserController {
     public ResponseEntity<UserToken> login(@RequestBody UserDto loginInformation) {
         UserToken userToken = loginUseCase.handle(loginInformation);
         if (userToken.getAuthToken().equals("'Unauthorized!'")) {
-            return ResponseEntity.status(400).body(userToken);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(userToken);
         } else {
             return ResponseEntity.status(HttpStatus.OK).body(userToken);
         }
@@ -40,8 +41,8 @@ public class UserController {
     public ResponseEntity<Object> register(@RequestBody UserDto userInformation) {
         Object handledStatus = registerUseCase.handle(userInformation);
         return handledStatus instanceof Boolean ?
-                new ResponseEntity<>(handledStatus, HttpStatus.OK)
-                : new ResponseEntity<>(handledStatus, HttpStatus.BAD_REQUEST);
+                ResponseEntity.status(HttpStatus.OK).body(handledStatus)
+                : ResponseEntity.status(HttpStatus.BAD_REQUEST).body(UserFriendlyExceptionMessage.from(handledStatus));
     }
 
     @PostMapping(value = "/update-user", consumes = "application/json", produces = "application/json")

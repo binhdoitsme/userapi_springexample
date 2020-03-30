@@ -36,7 +36,7 @@ public class UpdateUserUseCase implements RequestHandler<Composite<UserDto, Stri
     }
 
     private void updateUser(UserDto newUserData, String oldUsername) {
-        String salt = userRepository.findByUsername(oldUsername).get(0).getGeneratedSalt();
+        String salt = userRepository.findByUsername(oldUsername).getGeneratedSalt();
         String newPassword = UserValidation.encodePassword(newUserData.getPassword(), salt);
         userRepository.updateUser(newUserData.getUsername(), newPassword, newUserData.getDisplayName(),
                 newUserData.getEmail(), oldUsername);
